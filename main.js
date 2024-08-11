@@ -6,7 +6,7 @@ for (let i = 0; i < recipe_types.length; i++) {
             document.getElementById(recipe_types[j].id + "-editor").classList.add("hidden");
         }
         recipe_types[i].classList.add("selected");
-        document.getElementById(recipe_types[j].id + "-editor").classList.remove("hidden");
+        document.getElementById(recipe_types[i].id + "-editor").classList.remove("hidden");
     });
 }
 
