@@ -54,18 +54,32 @@
         </div>
 
         <div class="autocomplete-container generic-container">
-
+            
         </div>
 
         <div class="editor-container generic-container">
             <div class="recipe-editor" id="crafting-editor">
                 <script src="processors/crafting.js"></script>
-                <table>
-                    <tr>
-                        <td><input type="text" class="autocomplete"></td>
-                        
-                    </tr>
-                </table>
+                <div class="crafting-grid" style="display: flex; align-items: center">
+                    <table cellpadding="5">
+                        <tr>
+                            <td><input type="text" class="autocomplete" id="crafting-input-top-left"></td>
+                            <td><input type="text" class="autocomplete" id="crafting-input-top-middle"></td>
+                            <td><input type="text" class="autocomplete" id="crafting-input-top-right"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="autocomplete" id="crafting-input-middle-left"></td>
+                            <td><input type="text" class="autocomplete" id="crafting-input-middle-middle"></td>
+                            <td><input type="text" class="autocomplete" id="crafting-input-middle-right"></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" class="autocomplete" id="crafting-input-bottom-left"></td>
+                            <td><input type="text" class="autocomplete" id="crafting-input-bottom-middle"></td>
+                            <td><input type="text" class="autocomplete" id="crafting-input-bottom-right"></td>
+                        </tr>
+                    </table>
+                    <input type="text" class="autocomplete" id="crafting-output" >
+                </div>
             </div>
             <div class="recipe-editor" id="smelting-editor">
                 <script src="processors/smelting.js"></script>

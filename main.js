@@ -9,3 +9,4 @@ for (let i = 0; i < recipe_types.length; i++) {
         document.getElementById(recipe_types[j].id + "-editor").classList.remove("hidden");
     });
 }
+
