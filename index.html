@@ -54,12 +54,22 @@
         </div>
 
         <div class="autocomplete-container generic-container">
-            
+            <div class="autocomplete-suggestions">
+                <ul>
+                    <li>
+                        
+                    </li>
+                </ul>
+            </div>
         </div>
 
         <div class="editor-container generic-container">
             <div class="recipe-editor" id="crafting-editor">
-                <script src="processors/crafting.js"></script>
+
+                <input type="checkbox" name="crafting-is2x2" id="crafting-is2x2">
+                <label for="crafting-is2x2">2x2 grid</label>
+                <input type="checkbox" name="crafting-shapeless" id="crafting-shapeless">
+                <label for="crafting-shapeless">Shapeless</label>
                 <div class="crafting-grid" style="display: flex; align-items: center">
                     <table cellpadding="5">
                         <tr>
@@ -78,8 +88,9 @@
                             <td><input type="text" class="autocomplete" id="crafting-input-bottom-right"></td>
                         </tr>
                     </table>
-                    <input type="text" class="autocomplete" id="crafting-output" >
+                    <input type="text" class="autocomplete" id="crafting-output">
                 </div>
+                <script src="processors/crafting.js"></script>
             </div>
             <div class="recipe-editor" id="smelting-editor">
                 <script src="processors/smelting.js"></script>
@@ -93,6 +104,7 @@
         </div>
     </div>
     <script src="main.js"></script>
+    <script src="autocomplete-manager.js"></script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
