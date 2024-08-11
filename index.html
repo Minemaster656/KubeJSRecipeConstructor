@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>KubeJS recipe constructor</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="main.css">
+
+</head>
+
+<body>
+    <div class="container">
+        <h1><img src="assets/KubeJS.png" alt="KubeJS logo" width="150px"> Конструктор рецептов KubeJS</h1>
+
+        <!-- <h6>Увы, я не нашел как рендерить модели предметов и блоков, бэкенд, к слову, нужен какраз для них. Если найдёте
+            как это делать - напишите, пожалуйста. (ванильные предметы рендерить можно, проблема именно в модовых)</h3> -->
+        <hr>
+        <h6>Бэкэнд съели.</h6>
+        <hr>
+        <div class="recipe-types generic-container">
+
+            <div class="recipes-group">
+
+                <div class="recipes-group-name">
+                    <h1>Vanilla</h1>
+                </div>
+
+                <div class="recipes-group-recipes">
+
+                    <div class="recipe-type" id="crafting">
+                        <img src="" alt="">
+                        <p>Crafting</p>
+                    </div>
+
+                    <div class="recipe-type" id="smelting">
+                        <img src="" alt="">
+                        <p>Smelting</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="autocomplete-container generic-container">
+
+        </div>
+
+        <div class="editor-container generic-container">
+            <div class="recipe-editor" id="crafting-editor">
+                <script src="processors/crafting.js"></script>
+                <table>
+                    <tr>
+                        <td><input type="text" class="autocomplete"></td>
+                        
+                    </tr>
+                </table>
+            </div>
+            <div class="recipe-editor" id="smelting-editor">
+                <script src="processors/smelting.js"></script>
+            </div>
+
+
+        </div>
+
+        <div class="export-container generic-container">
+
+        </div>
+    </div>
+    <script src="main.js"></script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

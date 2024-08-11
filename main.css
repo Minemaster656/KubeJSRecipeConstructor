@@ -1,0 +1,93 @@
+:root{
+    --background-color: #161517;
+    --container-color: #1f1e21;
+    --font-color: #afa0ab;
+
+}
+body {
+    text-align: center;
+    /* background: rgb(51, 34, 51);
+    background: linear-gradient(315deg, rgba(51, 34, 51, 1) 0%, rgba(42, 52, 56, 1) 100%); */
+    /* background: rgb(135,90,170);
+background: linear-gradient(0deg, rgba(135,90,170,1) 0%, rgba(113,65,150,1) 14%, rgba(96,51,131,1) 32%, rgba(30,4,47,1) 100%); */
+    /* background: rgb(29, 11, 32);
+    background: linear-gradient(0deg, rgba(29, 11, 32, 1) 0%, rgba(137, 54, 164, 1) 50%, rgba(66, 25, 82, 1) 100%); */
+    /* background: rgb(117,60,124);
+background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%, rgba(113,51,131,1) 32%, rgba(30,4,47,1) 100%); */
+    background-color: #161517;
+    color: var(--font-color);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    font-family: montserrat, sans-serif;
+    line-height: 1.4;
+    padding-top: 20px;
+
+}
+.hidden{
+    display: none;
+}
+
+.generic-container {
+    border-radius: 5px;
+    /* border: 2px solid gray; */
+    margin: 10px;
+    padding: 5px;
+    /* background: rgb(32, 11, 30);
+    background: linear-gradient(0deg, rgba(32, 11, 30, 1) 0%, rgba(163, 54, 164, 1) 50%, rgba(95, 29, 97, 1) 100%); */
+    background-color: #1f1e21;
+}
+
+.recipe-types {}
+
+.recipes-group-recipes {
+    display: flex;
+}
+
+.recipes-group-name {
+    border-bottom: 1px dotted var(--font-color);
+}
+
+.recipe-type {
+    border-radius: 5px;
+    -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    transition: all 0.5s ease;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin: 5px;
+    background: rgb(79,38,122);
+background: linear-gradient(315deg, rgba(79,38,122,1) 0%, rgba(132,51,157,1) 100%);
+    font-size: large;
+    font-weight: 500;
+
+}
+
+.selected {
+    background: rgb(110,59,164);
+background: linear-gradient(315deg, rgba(110,59,164,1) 0%, rgba(176,74,207,1) 100%);
+    /* font-weight: bold; */
+    text-decoration: underline;
+    text-shadow: var(--background-color) 1px 0 10px;;
+}
+
+.recipe-type p {
+    margin: 0px;
+
+}
+
+.recipe-type:hover {
+
+    transform: scale(1.1);
+}
+.autocomplete{
+    border-radius: 5px;
+    border-color: var(--background-color);
+    background-color: var(--container-color);
+    height: 40px;
+}
+.autocomplete:focus{
+    border-color: var(--font-color);
+}
