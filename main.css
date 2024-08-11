@@ -98,6 +98,7 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
     padding: 10px;
     color: var(--font-color);
     font-weight: 400;
+    transition: all 0.5s ease;
 }
 
 .autocomplete:focus {
