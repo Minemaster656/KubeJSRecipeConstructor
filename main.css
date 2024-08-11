@@ -44,6 +44,7 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
 
 .recipes-group-recipes {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .recipes-group-name {
@@ -135,8 +136,26 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
 }
 
 .autocomplete-suggestion{
-    
+    border-radius: var(--border-radius);
+    background-color: var(--container-color);
+    border: 2px solid var(--background-color);
+    -webkit-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    -moz-box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    box-shadow: 4px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    transition: all 0.5s ease;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin: 5px;
+    font-size: large;
+    font-weight: 500;
+    /* flex: 1 1 150px; */
 }
-.autocomplete-suggestion-text{
-    
+.autocomplete-suggestion-text p{
+    margin: 0px;
+}
+.autocomplete-suggestions{
+    display: flex;
+    flex-wrap: wrap;
 }
