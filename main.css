@@ -176,6 +176,7 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
 .autocomplete-suggestions {
     display: flex;
     flex-wrap: wrap;
+    max-height: 512px;
 }
 .overflow-auto{
     overflow: auto;

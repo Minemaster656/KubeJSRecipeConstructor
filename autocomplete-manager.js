@@ -19,13 +19,16 @@ let isProcessing = false;
 const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
 
 
-    const MAX_SUGGESTIONS = 10
+    const MAX_SUGGESTIONS = 20
     autocomplete_suggestions_raw = autocomplete_suggestions_raw.slice(0, MAX_SUGGESTIONS)
     let existing_autocompletes = document.querySelectorAll(".autocomplete-suggestion");
     let autocomplete_suggestions_strings = []
+    let images_for_suggestions = {}
     for (let i = 0; i < autocomplete_suggestions_raw.length; i++) {
         autocomplete_suggestions_strings.push((autocomplete_suggestions_raw[i].isTag ? "#" : "") + autocomplete_suggestions_raw[i].namespace + ":" + autocomplete_suggestions_raw[i].id)
+        images_for_suggestions[autocomplete_suggestions_strings[i]] = autocomplete_suggestions_raw[i].image
     }
+    
     // autocomplete_suggestions_strings = autocomplete_suggestions_raw.forEach(e => {
     //     console.log(e.isTag ? "#" : "" + e.namespace + ":" + e.id)
     //     return e.isTag ? "#" : "" + e.namespace + ":" + e.id
@@ -56,11 +59,13 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
 
     for (let i = 0; i < autocomplete_suggestions_strings.length; i++) {
         if (lazy_new.includes(autocomplete_suggestions_strings[i])) continue
+
         let li = document.createElement("div");
         li.classList.add("autocomplete-suggestion");
         let iconcont = document.createElement("div");
         iconcont.classList.add("item-icon-container");
         let icon = document.createElement("img");
+        icon.src = images_for_suggestions[autocomplete_suggestions_strings[i]] != "" ? images_for_suggestions[autocomplete_suggestions_strings[i]] : "assets/missing.svg";
         icon.classList.add("item-icon");
         iconcont.appendChild(icon);
         li.appendChild(iconcont);
@@ -269,7 +274,7 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
                     isTag: false,
                     namespace: parts[0],
                     id: parts[1],
-                    nbt: parts.length > 2 ? parts.splice(2).join('__') : '',
+                    nbt: parts.length > 2 ? parts.splice(2).join('__').split(".").slice(0, -1).join(".") : '',
                     filename: filename,
                     image: `data:image/png;base64,${data}`
                 })));
@@ -297,3 +302,24 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
         alert('Произошла ошибка при загрузке архива.');
     }
 });
+function DEBUG_download_autocomplete_as_JSON(){
+    // Преобразуем массив в JSON с отступами
+    const jsonString = JSON.stringify(autocomplete, null, 4);
+
+    // Создаем Blob с содержимым JSON
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Создаем ссылку для скачивания
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'data.json';
+
+    // Программно нажимаем на ссылку для скачивания
+    document.body.appendChild(a);
+    a.click();
+
+    // Убираем ссылку после скачивания
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
