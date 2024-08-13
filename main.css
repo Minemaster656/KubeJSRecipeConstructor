@@ -26,6 +26,22 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
 
 }
 
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: 5px 5px 5px -5px rgba(34, 60, 80, 0.2) inset;
+    background-color: var(--container-color);
+    /* border-radius: 10px; */
+    /* box-shadow: 5px 0px 5px -5px rgba(255, 255, 255, 0.26) inset; */
+}
+
+::-webkit-scrollbar-thumb {
+    
+    background: var(--font-color)
+}
+
 .hidden {
     display: none;
 }
@@ -135,7 +151,7 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
     background: linear-gradient(315deg, rgba(47, 44, 54, 1) 0%, rgba(56, 51, 60, 1) 100%);
 }
 
-.autocomplete-suggestion{
+.autocomplete-suggestion {
     border-radius: var(--border-radius);
     background-color: var(--container-color);
     border: 2px solid var(--background-color);
@@ -152,10 +168,15 @@ background: linear-gradient(0deg, rgba(117,60,124,1) 0%, rgba(126,65,150,1) 14%,
     font-weight: 500;
     /* flex: 1 1 150px; */
 }
-.autocomplete-suggestion-text p{
+
+.autocomplete-suggestion-text p {
     margin: 0px;
 }
-.autocomplete-suggestions{
+
+.autocomplete-suggestions {
     display: flex;
     flex-wrap: wrap;
+}
+.overflow-auto{
+    overflow: auto;
 }

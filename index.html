@@ -14,18 +14,32 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/smoothscroll/1.4.10/SmoothScroll.min.js"
+        integrity="sha256-huW7yWl7tNfP7lGk46XE+Sp0nCotjzYodhVKlwaNeco=" crossorigin="anonymous"></script>
+    <script>SmoothScroll({ animationTime: 800, stepSize: 75, accelerationDelta: 30, accelerationMax: 2, keyboardSupport: true, arrowScroll: 50, pulseAlgorithm: true, pulseScale: 4, pulseNormalize: 1, touchpadSupport: true, })</script>
     <link rel="stylesheet" href="main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 </head>
 
 <body>
     <div class="container">
+        <!-- <div class="row"> -->
         <h1><img src="assets/KubeJS.png" alt="KubeJS logo" width="150px"> Конструктор рецептов KubeJS</h1>
 
         <!-- <h6>Увы, я не нашел как рендерить модели предметов и блоков, бэкенд, к слову, нужен какраз для них. Если найдёте
             как это делать - напишите, пожалуйста. (ванильные предметы рендерить можно, проблема именно в модовых)</h3> -->
         <hr>
-        <h6>Бэкэнд съели.</h6>
+        <!-- <h6>Бэкэнд съели.</h6> -->
+        <h3>ДЛЯ ЭКСПОРТА ИКОНОК ИЗ ИГРЫ, ИСПОЛЬЗУЙТЕ МОД <a
+                href="https://www.curseforge.com/minecraft/mc-mods/iconexporter">IconExporter</a></h3>
+        <h4> (он требует библиотеку
+            <a href="https://legacy.curseforge.com/minecraft/mc-mods/cyclops-core">Cyclops Core</a> и есть только на
+            Forge/NeoForge 1.15.2+, если вы не можете использовать его из-за более старых версий, загрузчика модов или
+            других причин, то используйте автокомплиты!)
+        </h4>
+        <h3>Для экспорта используйте команду /iconexporter | рекомендуемый размер иконок - 64x64 (он идёт по умолчанию).
+            Папка с иконками находится в папке игры. Подробнее прочитайте на странице мода.</h3>
         <hr>
         <div class="recipe-types generic-container">
 
@@ -38,13 +52,15 @@
                 <div class="recipes-group-recipes">
 
                     <div class="recipe-type" id="crafting">
-                        <div class="item-icon-container"><img src="assets/missing.svg" alt="" class="item-icon"></div>
+                        <div class="item-icon-container"><img src="assets/missing.svg" alt="" class="item-icon">
+                        </div>
 
                         <p>Crafting</p>
                     </div>
 
                     <div class="recipe-type" id="smelting">
-                        <div class="item-icon-container"><img src="assets/missing.svg" alt="" class="item-icon"></div>
+                        <div class="item-icon-container"><img src="assets/missing.svg" alt="" class="item-icon">
+                        </div>
                         <p>Smelting</p>
                     </div>
 
@@ -55,8 +71,14 @@
         </div>
 
         <div class="autocomplete-container generic-container">
-            <div class="autocomplete-suggestions">
-                
+            <input type="file" id="archiveInput" accept=".zip" />
+            <button id="archiveUploadButton">Загрузить архив с экспортами (.zip) (это может занять немного времени)</button>
+
+            
+            <h1>Автодополнение</h1>
+
+            <div class="autocomplete-suggestions overflow-auto">
+
             </div>
         </div>
 
@@ -99,6 +121,7 @@
         <div class="export-container generic-container">
 
         </div>
+        <!-- </div> -->
     </div>
     <script src="main.js"></script>
     <script src="autocomplete-manager.js"></script>

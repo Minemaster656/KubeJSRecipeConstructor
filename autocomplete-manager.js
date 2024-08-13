@@ -1,13 +1,14 @@
 let selected_autocomplete_field = null
+let isLoading = false
 //! {"isTag":boolean, "namespace":string, "id":string}
 let autocomplete = [
-    { "isTag": true, "namespace": "minecraft", "id": "moss_replacable" },
-    { "isTag": true, "namespace": "forge", "id": "ores" },
-    { "isTag": false, "namespace": "minecraft", "id": "air" },
-    { "isTag": false, "namespace": "minecraft", "id": "lava_bucket" },
-    { "isTag": false, "namespace": "minecraft", "id": "water_bucket" },
-    { "isTag": false, "namespace": "create", "id": "zink_ingot" },
-    { "isTag": false, "namespace": "create", "id": "andesite_alloy" }
+    // { "isTag": true, "namespace": "minecraft", "id": "moss_replacable" },
+    // { "isTag": true, "namespace": "forge", "id": "ores" },
+    // { "isTag": false, "namespace": "minecraft", "id": "air" },
+    // { "isTag": false, "namespace": "minecraft", "id": "lava_bucket" },
+    // { "isTag": false, "namespace": "minecraft", "id": "water_bucket" },
+    // { "isTag": false, "namespace": "create", "id": "zink_ingot" },
+    // { "isTag": false, "namespace": "create", "id": "andesite_alloy" }
 ]
 
 let autocomplete_fields = document.querySelectorAll(".autocomplete");
@@ -54,7 +55,8 @@ for (let i = 0; i < autocomplete_fields.length; i++) {
 
 }
 function raw_autocompletes_to_html(autocomplete_suggestions_raw) {
-
+    const MAX_SUGGESTIONS = 10
+    autocomplete_suggestions_raw = autocomplete_suggestions_raw.slice(0, MAX_SUGGESTIONS)
     let existing_autocompletes = document.querySelectorAll(".autocomplete-suggestion");
     let autocomplete_suggestions_strings = []
     for (let i = 0; i < autocomplete_suggestions_raw.length; i++) {
@@ -64,7 +66,8 @@ function raw_autocompletes_to_html(autocomplete_suggestions_raw) {
     //     console.log(e.isTag ? "#" : "" + e.namespace + ":" + e.id)
     //     return e.isTag ? "#" : "" + e.namespace + ":" + e.id
     // });
-    console.log(autocomplete_suggestions_strings)
+    // console.log(autocomplete_suggestions_strings)
+    
     let remove_existing = []
     let lazy_new = []
     for (let i = 0; i < existing_autocompletes.length; i++) {
@@ -111,3 +114,237 @@ function raw_autocompletes_to_html(autocomplete_suggestions_raw) {
 
     }
 }
+async function clearAutocomplete() {
+    autocomplete = []
+    try {
+
+        const request = indexedDB.open('myDatabase', 1);
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            db.createObjectStore('autocompletes', { keyPath: 'filename' });
+        };
+        const db = await new Promise((resolve, reject) => {
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        const transaction = db.transaction('autocompletes', 'readwrite');
+        const store = transaction.objectStore('autocompletes');
+        store.clear();
+        for (const item of autocomplete) {
+            store.add(item);
+        }
+
+
+    } catch (error) {
+        console.error('Error saving autocompletes: ', error);
+    } finally {
+        
+    }
+}
+// async function loadAutocompletesFromDB() {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             const indexedDB =
+//                 window.indexedDB ||
+//                 window.mozIndexedDB ||
+//                 window.webkitIndexedDB ||
+//                 window.msIndexedDB;
+
+//             if (!indexedDB) {
+//                 reject(new Error('IndexedDB is not supported in this browser'));
+//                 return;
+//             }
+
+//             let request = indexedDB.open('autocompletes', 1);
+
+//             request.onupgradeneeded = event => {
+//                 const db = event.target.result;
+//                 db.createObjectStore('autocompletes', { keyPath: 'filename' });
+//             };
+
+//             let db;
+//             request.onsuccess = () => {
+//                 db = request.result;
+//                 const transaction = db.transaction('autocompletes', 'readonly');
+//                 const store = transaction.objectStore('autocompletes');
+//                 const allDataRequest = store.getAll();
+
+//                 allDataRequest.onsuccess = () => resolve(allDataRequest.result);
+//                 allDataRequest.onerror = () => reject(allDataRequest.error);
+//             };
+
+//             request.onerror = () => reject(request.error);
+//         } catch (error) {
+//             reject(error);
+//         }
+//     });
+// }
+
+// async function loadAutocompletesFromDB() {
+//     return new Promise(async (resolve, reject) => {
+//         try {
+//             let indexedDB =
+//                 window.indexedDB ||
+//                 window.mozIndexedDB ||
+//                 window.webkitIndexedDB ||
+//                 window.msIndexedDB;
+//             let request = indexedDB.open('autocompletes', 1);
+
+
+
+
+
+//             request.onupgradeneeded = event => {
+//                 const db = event.target.result;
+//                 db.createObjectStore('autocompletes', { keyPath: 'filename' });
+//             };
+//             const db = await new Promise((resolve, reject) => {
+//                 request.onsuccess = () => resolve(request.result);
+//                 request.onerror = () => reject(request.error);
+//             });
+
+//             const transaction = db.transaction('autocompletes', 'readonly'); //why Uncaught (in promise) DOMException: Failed to execute 'transaction' on 'IDBDatabase': One of the specified object stores was not found.
+//             const store = transaction.objectStore('autocompletes');
+//             const allDataRequest = store.getAll();
+//             console.log(allDataRequest)
+
+//             allDataRequest.onsuccess = () => resolve(allDataRequest.result);
+//             allDataRequest.onerror = () => reject(allDataRequest.error);
+//         } catch (error) {
+//             reject(error);
+//         }
+//     });
+
+// }
+async function loadAutocompletesFromDB() {
+    if (isLoading) return;
+
+    isLoading = true;
+    try {
+        const request = indexedDB.open('myDatabase', 1);
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            db.createObjectStore('autocompletes', { keyPath: 'filename' });
+        };
+
+        const db = await new Promise((resolve, reject) => {
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        const transaction = db.transaction('autocompletes', 'readonly');
+        const store = transaction.objectStore('autocompletes');
+        const allDataRequest = store.getAll();
+
+        allDataRequest.onsuccess = () => {
+            const imagesArray = allDataRequest.result;
+            // console.log('Loaded images:', imagesArray);
+            console.log(`Loaded ${imagesArray.length} autocomplete entries from IndexedDB`);
+            autocomplete = imagesArray;
+        };
+    } catch (error) {
+        console.error('Error loading autocompletes: ', error);
+    } finally {
+        isLoading = false;
+    }
+
+}
+loadAutocompletesFromDB()
+async function saveAutocompletesToDB() {
+    if (isLoading) return;
+
+    isLoading = true;
+    try {
+
+        const request = indexedDB.open('myDatabase', 1);
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+            db.createObjectStore('autocompletes', { keyPath: 'filename' });
+        };
+        const db = await new Promise((resolve, reject) => {
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        const transaction = db.transaction('autocompletes', 'readwrite');
+        const store = transaction.objectStore('autocompletes');
+        store.clear();
+        for (const item of autocomplete) {
+            store.add(item);
+        }
+
+
+    } catch (error) {
+        console.error('Error saving autocompletes: ', error);
+    } finally {
+        isLoading = false;
+    }
+}
+
+document.getElementById('archiveUploadButton').addEventListener('click', async () => {
+    const input = document.getElementById('archiveInput');
+    
+    if (input.files.length === 0) {
+        alert('Пожалуйста, выберите архив.');
+        return;
+    }
+
+    const file = input.files[0];
+    
+    if (!file.name.endsWith('.zip')) {
+        alert('Пожалуйста, загрузите архив в формате .zip');
+        return;
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const jszip = new JSZip();
+
+    try {
+        const zip = await jszip.loadAsync(arrayBuffer);
+        const imagePromises = [];
+
+        Object.keys(zip.files).forEach((filename) => {
+            // Проверяем, является ли файл изображением
+            //wildberries__sweet_berry_jam
+            //wardrobe__savanna_chestplate__{Damage__0}.png
+            let filename_no_zip_name = filename.split('/').splice(1).join('/')
+            // TODO: обработка метаданных
+            let parts = filename_no_zip_name.split('__');
+            
+            if (/\.(png|gif|apng|jpg|jpeg|svg)$/i.test(filename)) {
+                imagePromises.push(zip.files[filename].async('base64').then((data) => ({
+                    isTag: false,
+                    namespace: parts[0],
+                    id: parts[1],
+                    nbt: parts.length > 2 ? parts.splice(2).join('__') : '',
+                    filename: filename,
+                    image: `data:image/png;base64,${data}`
+                })));
+            }
+        });
+
+        const images = await Promise.all(imagePromises);
+        console.log(images); // Массив объектов { filename: str, image: base64 str }
+        
+        for (const image of images) {
+            let doesExist = false
+            for (const autocomplete_item of autocomplete) {
+                if (autocomplete_item.id == image.id && autocomplete_item.namespace == image.namespace && autocomplete_item.nbt == image.nbt) {
+                    doesExist = true
+                    break
+                }
+            }
+            if (!doesExist) autocomplete.push(image);
+        }
+        saveAutocompletesToDB();
+        alert('Загружено ' + images.length + ' автодополнений.');
+
+    } catch (error) {
+        console.error('Error while loading archive:', error);
+        alert('Произошла ошибка при загрузке архива.');
+    }
+});
