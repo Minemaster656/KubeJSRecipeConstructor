@@ -28,7 +28,7 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
         autocomplete_suggestions_strings.push((autocomplete_suggestions_raw[i].isTag ? "#" : "") + autocomplete_suggestions_raw[i].namespace + ":" + autocomplete_suggestions_raw[i].id)
         images_for_suggestions[autocomplete_suggestions_strings[i]] = autocomplete_suggestions_raw[i].image
     }
-    
+
     // autocomplete_suggestions_strings = autocomplete_suggestions_raw.forEach(e => {
     //     console.log(e.isTag ? "#" : "" + e.namespace + ":" + e.id)
     //     return e.isTag ? "#" : "" + e.namespace + ":" + e.id
@@ -101,7 +101,8 @@ const handleInput = (i) => {
             if (val[0] === "#" & !autocomplete[j].isTag || val[0] !== "#" & autocomplete[j].isTag) continue
             //console.log(`${autocomplete[j].isTag ? '#' : ''}${autocomplete[j].namespace}:${autocomplete[j].id}`)
             // console.log(val + "   |   " + JSON.stringify(autocomplete[j]))
-            if (val.search(":") >= 0) {
+            
+            if (val.includes(":")) {
                 // console.log("^^^ has namespace")
 
                 let namespace = val.split(":")[0]
@@ -113,7 +114,9 @@ const handleInput = (i) => {
                 // console.log("^^^ no namespace")
                 // console.log(JSON.stringify(autocomplete[j]) + "   |   " + "id.search(" + val_no_tag + ") = " + autocomplete[j].id.includes(val_no_tag) + "   |   " + "namespace.search(" + val + ") = " + autocomplete[j].namespace.includes(val))
                 //^^^ не везде val на val_no_tag заменен и search не заменен в строках на inncludes
-                if (!autocomplete[j].id.includes(val_no_tag) && !autocomplete[j].namespace.includes(val_no_tag)) continue
+                console.log(val_no_tag)
+                if (!autocomplete[j].id.includes(val_no_tag)) continue
+                if (!autocomplete[j].namespace.includes(val_no_tag)) continue
             }
 
             suggestions_raw.push(autocomplete[j])
@@ -303,7 +306,7 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
         alert('Произошла ошибка при загрузке архива.');
     }
 });
-function DEBUG_download_autocomplete_as_JSON(){
+function DEBUG_download_autocomplete_as_JSON() {
     // Преобразуем массив в JSON с отступами
     const jsonString = JSON.stringify(autocomplete, null, 4);
 
