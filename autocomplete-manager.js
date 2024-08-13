@@ -266,8 +266,9 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
             //wildberries__sweet_berry_jam
             //wardrobe__savanna_chestplate__{Damage__0}.png
             let filename_no_zip_name = filename.split('/').splice(1).join('/')
+            let only_filename = filename_no_zip_name.split(".").slice(0, -1).join(".")
             // TODO: обработка метаданных
-            let parts = filename_no_zip_name.split('__');
+            let parts = only_filename.split('__');
 
             if (/\.(png|gif|apng|jpg|jpeg|svg)$/i.test(filename)) {
                 imagePromises.push(zip.files[filename].async('base64').then((data) => ({
