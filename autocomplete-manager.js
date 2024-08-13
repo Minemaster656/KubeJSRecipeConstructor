@@ -10,11 +10,16 @@ let autocomplete = {
     // { "isTag": false, "namespace": "create", "id": "zink_ingot" },
     // { "isTag": false, "namespace": "create", "id": "andesite_alloy" }
 }
+let namespaces = []
+
 
 let autocomplete_fields = document.querySelectorAll(".autocomplete");
 
 let lastCallTime = 0;
 let isProcessing = false;
+let currentItemsTab = ""
+
+
 
 const raw_autocompletes_to_html = async (autocomplete_suggestions_raw_ids) => {
 
@@ -55,6 +60,7 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw_ids) => {
     }
 
     for (let i = 0; i < remove_existing.length; i++) {
+        //! тут нужно попросить сборщик мусора убрать обработчики
         remove_existing[i].remove()
     }
 
@@ -68,6 +74,7 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw_ids) => {
         let icon = document.createElement("img");
         // icon.src = images_for_suggestions[autocomplete_suggestions_strings[i]] != "" ? images_for_suggestions[autocomplete_suggestions_strings[i]] : "assets/missing.svg";
         icon.src = autocomplete[autocomplete_suggestions_raw_ids[i]] != "" ? autocomplete[autocomplete_suggestions_raw_ids[i]] : "assets/missing.svg";
+        icon.alt = autocomplete_suggestions_raw_ids[i];
         icon.classList.add("item-icon");
         iconcont.appendChild(icon);
         li.appendChild(iconcont);
@@ -78,6 +85,10 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw_ids) => {
         autocompleteSuggestionText.appendChild(ast_p);
         li.appendChild(autocompleteSuggestionText);
         document.querySelector(".autocomplete-suggestions").appendChild(li);
+        li.addEventListener("click", () => {
+            selected_autocomplete_field.value = ast_p.innerText;
+            selected_autocomplete_field.dispatchEvent(new Event("input"));
+        })
         // li.appendChild(document.createElement("div")).classList.add("item-icon-container").appendChild(document.createElement("img")).classList.add("item-icon");
         // li.appendChild(document.createElement("div")).classList.add("autocomplete-suggestion-text").appendChild(document.createElement("p").innerText = autocomplete_suggestions_strings[i]);
         // document.querySelector(".autocomplete-suggestions").appendChild(li);
@@ -85,7 +96,7 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw_ids) => {
 
     }
 };
-const handleInput = (i) => {
+const handleInput = (i, thisNode) => {
     return async (event) => {
         const now = Date.now();
         if (isProcessing && now - lastCallTime < 300) {
@@ -99,6 +110,10 @@ const handleInput = (i) => {
         let val = autocomplete_fields[i].value;
         // let val_no_tag = val.startsWith("#") ? val.split("").splice(1).join("") : val
         let suggestions_raw_ids = []
+
+        let imgTag = autocomplete_fields[i].parentElement.querySelector(".item-icon")
+        imgTag.src = autocomplete[val] != "" && autocomplete[val] != undefined ? autocomplete[val] : "assets/missing.svg"
+        imgTag.alt = val
         // for (let j = 0; j < autocomplete.length; j++) {
         //     if (val[0] === "#" & !autocomplete[j].isTag || val[0] !== "#" & autocomplete[j].isTag) continue
         //     //console.log(`${autocomplete[j].isTag ? '#' : ''}${autocomplete[j].namespace}:${autocomplete[j].id}`)
@@ -148,7 +163,7 @@ function sortIDsByNamespaceEntryFirst(ids, namespace_entry) {
         let id_no_tag = ids[i].startsWith("#") ? ids[i].split("").splice(1).join("") : ids[i]
         if (id_no_tag.startsWith(namespace_entry)) {
             selected_ids_by_namespace.push(ids[i])
-        } else{
+        } else {
             selected_ids_by_id.push(ids[i])
         }
     }
@@ -164,8 +179,15 @@ for (let i = 0; i < autocomplete_fields.length; i++) {
         }
         selected_autocomplete_field.classList.add("last-selected-autocomplete");
     });
+    let img_container = document.createElement("div");
+    img_container.classList.add("item-icon-container");
 
+    autocomplete_fields[i].parentElement.appendChild(img_container)
+    let img_item = document.createElement("img");
+    img_item.classList.add("item-icon");
+    img_container.appendChild(img_item)
     autocomplete_fields[i].addEventListener("input", handleInput(i));
+
 
 }
 
@@ -232,9 +254,18 @@ async function loadAutocompletesFromDB() {
             //autocomplete = imagesArray;
             results.forEach(item => {
                 autocomplete[item.id] = item.value; // Замените 'value' на ваше поле
+                // console.log(item);
+                // console.log((item['id'].startsWith("#") ? item['id'].split("").splice(1).join("") : item['id']))
+                let namespace = ((item['id'].startsWith("#") ? item['id'].split("").splice(1).join("") : item['id']).split(":"))[0]
+                if (!namespaces.includes(namespace)) {
+                    namespaces.push(namespace)
+                }
+                
             });
             console.log(`Loaded ${Object.keys(autocomplete).length} autocomplete entries from IndexedDB`);
+            refreshItemsList()
         };
+        
     } catch (error) {
         console.error('Error loading autocompletes: ', error);
     } finally {
@@ -268,8 +299,11 @@ async function saveAutocompletesToDB() {
         // }
         for (key of Object.keys(autocomplete)) {
             store.put({ "id": key, "value": autocomplete[key] });
+            
+            
+            
         }
-
+        
 
     } catch (error) {
         console.error('Error saving autocompletes: ', error);
@@ -277,6 +311,7 @@ async function saveAutocompletesToDB() {
         isLoading = false;
     }
 }
+
 //! UPLOAD ZIP
 document.getElementById('archiveUploadButton').addEventListener('click', async () => {
     const input = document.getElementById('archiveInput');
@@ -308,7 +343,9 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
             let only_filename = filename_no_zip_name.split(".").slice(0, -1).join(".")
             // TODO: обработка метаданных
             let parts = only_filename.split('__');
-
+            if (!namespaces.includes(parts[0])) {
+                namespaces.push(parts[0])
+            }
             if (/\.(png|gif|apng|jpg|jpeg|svg)$/i.test(filename)) {
                 imagePromises.push(zip.files[filename].async('base64').then((data) => ({
                     isTag: false,
@@ -328,14 +365,14 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
             let compiled_id = (image.isTag ? "#" : "") + image.namespace + ":" + image.id
             if (autocomplete[compiled_id] === undefined) {
                 autocomplete[compiled_id] = image.image;
-                
+
             }
 
 
         }
         saveAutocompletesToDB();
         alert('Загружено ' + images.length + ' автодополнений.');
-
+        refreshItemsList();
     } catch (error) {
         console.error('Error while loading archive:', error);
         alert('Произошла ошибка при загрузке архива.');
@@ -361,4 +398,86 @@ function DEBUG_download_autocomplete_as_JSON() {
     // Убираем ссылку после скачивания
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+}
+async function refreshItemsList() {
+    console.log("Items list refreshed!")
+    let tabs_parent = document.querySelector(".items-list-tabs")
+    tabs_parent.innerHTML = ""
+    // console.log(namespaces)
+    for (let i = 0; i < namespaces.length; i++) {
+        let namespace_for_event = namespaces[i]
+        let tab = document.createElement("div")
+        tab.classList.add("items-tab")
+        tabs_parent.appendChild(tab)
+
+        let icon_cont = document.createElement("div")       
+        icon_cont.classList.add("item-icon-container")
+        tab.appendChild(icon_cont)
+        let icon = document.createElement("img")
+        icon.classList.add("item-icon")
+        let icon_src = ""
+        for (key of Object.keys(autocomplete)) {
+            if ((key.startsWith("#") ? key.split("").splice(1).join("") : key).split(":")[0] == namespace_for_event) {
+                icon_src = autocomplete[key]
+                break
+            }
+        }
+        icon.src = icon_src != ""? icon_src : "assets/missing.svg"
+        icon.alt = namespaces[i]
+        icon_cont.appendChild(icon)
+        
+        let tab_text = document.createElement("p")
+        tab_text.innerText = namespaces[i]
+        tab.appendChild(tab_text)
+        
+        tab.addEventListener("click", () => {
+            console.log("Click on tab " + namespace_for_event)
+            for (let j = 0; j < tabs_parent.children.length; j++) {
+                tabs_parent.children[j].classList.remove("selected-items-tab")
+            }
+            tab.classList.add("selected-items-tab")
+            renderItemsList(namespace_for_event, tab)
+        })
+    }
+}
+const renderItemsList = async (namespace, tab_node) => {
+    console.log("Rendering items list for " + namespace)
+    if (namespace == currentItemsTab) return
+    currentItemsTab = namespace
+    let items_list = document.querySelector(".items-list-grid")
+    let all_items_in_namespace = []
+    for (key of Object.keys(autocomplete)) {
+        if ((key.startsWith("#") ? key.split("").splice(1).join("") : key).split(":")[0] == namespace) {
+            all_items_in_namespace.push(key)
+        }
+    }
+    items_list.innerHTML = ""
+    for (let i = 0; i < all_items_in_namespace.length; i++) {
+        let item = document.createElement("div")
+        item.classList.add("item-in-list")
+        let icon_cont = document.createElement("div")
+        icon_cont.classList.add("item-icon-container")
+        let icon = document.createElement("img")
+        icon.classList.add("item-icon")
+        icon.src = autocomplete[all_items_in_namespace[i]] != "" && autocomplete[all_items_in_namespace[i]] != undefined ? autocomplete[all_items_in_namespace[i]] : "assets/missing.svg"
+        icon.alt = all_items_in_namespace[i]
+        //setting tab's icon if it is missing
+        // if (tab_node.querySelector(".item-icon").src = "assets/missing.svg") {
+        //     tab_node.querySelector(".item-icon").src = icon.src
+        // }
+        icon_cont.appendChild(icon)
+        item.appendChild(icon_cont)
+        // let item_text = document.createElement("p")
+        // item_text.innerText = all_items_in_namespace[i]
+        // item.appendChild(item_text)
+        items_list.appendChild(item)
+        item.id = all_items_in_namespace[i] 
+        item.addEventListener("click", () => {
+            renderItemInfo(all_items_in_namespace[i])
+        })
+    }
+
+}
+function renderItemInfo(id) {
+
 }

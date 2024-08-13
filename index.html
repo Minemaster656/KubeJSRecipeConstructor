@@ -23,6 +23,7 @@
 </head>
 
 <body>
+    
     <div class="container">
         <!-- <div class="row"> -->
         <h1><img src="assets/KubeJS.png" alt="KubeJS logo" width="150px"> Конструктор рецептов KubeJS</h1>
@@ -38,8 +39,9 @@
             Forge/NeoForge 1.15.2+, если вы не можете использовать его из-за более старых версий, загрузчика модов или
             других причин, то используйте автокомплиты!)
         </h4>
-        <h3>Для экспорта используйте команду /iconexporter | рекомендуемый размер иконок - 64x64 (он идёт по умолчанию).
+        <h3>Для экспорта используйте команду /iconexporter | рекомендуемый размер иконок - 32x32 (он идёт по умолчанию).
             Папка с иконками находится в папке игры. Подробнее прочитайте на странице мода.</h3>
+        <h1>ПРИ ЭКСПОРТЕ ИГРА БУДЕТ ИСПОЛЬЗОВАТЬ ВСЮ ОПЕРАТИВНУЯ ПАМЯТЬ, ЧТО У ВАС ЕСТЬ!!!</h1>
         <hr>
         <div class="recipe-types generic-container">
 
@@ -81,6 +83,19 @@
             <div class="autocomplete-suggestions overflow-auto">
 
             </div>
+            <div class="items-list-container generic-container">
+                <div class="items-list-tabs">
+                    <!-- <div class="items-tab">
+                        
+                    </div> -->
+                </div>
+                <div class="items-list-grid">
+                    
+                </div>
+                <div class="item-info-container">
+
+                </div>
+            </div>
         </div>
 
         <div class="editor-container generic-container">
@@ -93,22 +108,22 @@
                 <div class="crafting-grid" style="display: flex; align-items: center">
                     <table cellpadding="5">
                         <tr>
-                            <td><input type="text" class="autocomplete" id="crafting-input-top-left"></td>
-                            <td><input type="text" class="autocomplete" id="crafting-input-top-middle"></td>
-                            <td><input type="text" class="autocomplete" id="crafting-input-top-right"></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-top-left"></div></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-top-middle"></div></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-top-right"></div></td>
                         </tr>
                         <tr>
-                            <td><input type="text" class="autocomplete" id="crafting-input-middle-left"></td>
-                            <td><input type="text" class="autocomplete" id="crafting-input-middle-middle"></td>
-                            <td><input type="text" class="autocomplete" id="crafting-input-middle-right"></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-middle-left"></div></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-middle-middle"></div></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-middle-right"></div></td>
                         </tr>
                         <tr>
-                            <td><input type="text" class="autocomplete" id="crafting-input-bottom-left"></td>
-                            <td><input type="text" class="autocomplete" id="crafting-input-bottom-middle"></td>
-                            <td><input type="text" class="autocomplete" id="crafting-input-bottom-right"></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-bottom-left"></div></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-bottom-middle"></div></td>
+                            <td><div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-input-bottom-right"></div></td>
                         </tr>
                     </table>
-                    <input type="text" class="autocomplete" id="crafting-output">
+                    <div class="autocomplete-field-container"><input type="text" class="autocomplete" id="crafting-output"></div>
                 </div>
                 <script src="processors/crafting.js"></script>
             </div>
