@@ -12,49 +12,13 @@ let autocomplete = [
 ]
 
 let autocomplete_fields = document.querySelectorAll(".autocomplete");
-for (let i = 0; i < autocomplete_fields.length; i++) {
-    autocomplete_fields[i].addEventListener("focus", () => {
-        selected_autocomplete_field = autocomplete_fields[i];
-        for (let j = 0; j < autocomplete_fields.length; j++) {
-            autocomplete_fields[j].classList.remove("last-selected-autocomplete");
-        }
-        selected_autocomplete_field.classList.add("last-selected-autocomplete");
-    });
-    autocomplete_fields[i].addEventListener("input", () => {
-        // console.clear()
-        let val = autocomplete_fields[i].value;
-        let val_no_tag = val.startsWith("#") ? val.split("").splice(1).join("") : val
-        let suggestions_raw = []
-        for (let j = 0; j < autocomplete.length; j++) {
-            if (val[0] === "#" & !autocomplete[j].isTag || val[0] !== "#" & autocomplete[j].isTag) continue
-            //console.log(`${autocomplete[j].isTag ? '#' : ''}${autocomplete[j].namespace}:${autocomplete[j].id}`)
-            console.log(val + "   |   " + JSON.stringify(autocomplete[j]))
-            if (val.search(":") >= 0) {
-                // console.log("^^^ has namespace")
 
-                let namespace = val.split(":")[0]
-                namespace = namespace.startsWith("#") ? namespace.split("").splice(1).join("") : namespace
-                if (autocomplete[j].namespace != namespace) continue
-                if (autocomplete[j].id.startsWith(val.split(":")[1]) == false) continue //TODO: поиск в середине а не только в начале (search). сделай
-            }
-            else {
-                // console.log("^^^ no namespace")
-                // console.log(JSON.stringify(autocomplete[j]) + "   |   " + "id.search(" + val_no_tag + ") = " + autocomplete[j].id.includes(val_no_tag) + "   |   " + "namespace.search(" + val + ") = " + autocomplete[j].namespace.includes(val))
-                //^^^ не везде val на val_no_tag заменен и search не заменен в строках на inncludes
-                if (!autocomplete[j].id.includes(val_no_tag) && !autocomplete[j].namespace.includes(val_no_tag)) continue
-            }
+let lastCallTime = 0;
+let isProcessing = false;
 
-            suggestions_raw.push(autocomplete[j])
+const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
 
 
-
-        }
-        console.log(suggestions_raw)
-        raw_autocompletes_to_html(suggestions_raw)
-    });
-
-}
-function raw_autocompletes_to_html(autocomplete_suggestions_raw) {
     const MAX_SUGGESTIONS = 10
     autocomplete_suggestions_raw = autocomplete_suggestions_raw.slice(0, MAX_SUGGESTIONS)
     let existing_autocompletes = document.querySelectorAll(".autocomplete-suggestion");
@@ -67,7 +31,7 @@ function raw_autocompletes_to_html(autocomplete_suggestions_raw) {
     //     return e.isTag ? "#" : "" + e.namespace + ":" + e.id
     // });
     // console.log(autocomplete_suggestions_strings)
-    
+
     let remove_existing = []
     let lazy_new = []
     for (let i = 0; i < existing_autocompletes.length; i++) {
@@ -113,7 +77,66 @@ function raw_autocompletes_to_html(autocomplete_suggestions_raw) {
 
 
     }
+};
+const handleInput = (i) => {
+    return async (event) => {
+        const now = Date.now();
+        if (isProcessing && now - lastCallTime < 300) {
+            return; // Пропустить, если еще не прошло 300 мс
+        }
+
+        lastCallTime = now;
+        isProcessing = true;
+
+        // console.clear()
+        let val = autocomplete_fields[i].value;
+        let val_no_tag = val.startsWith("#") ? val.split("").splice(1).join("") : val
+        let suggestions_raw = []
+        for (let j = 0; j < autocomplete.length; j++) {
+            if (val[0] === "#" & !autocomplete[j].isTag || val[0] !== "#" & autocomplete[j].isTag) continue
+            //console.log(`${autocomplete[j].isTag ? '#' : ''}${autocomplete[j].namespace}:${autocomplete[j].id}`)
+            // console.log(val + "   |   " + JSON.stringify(autocomplete[j]))
+            if (val.search(":") >= 0) {
+                // console.log("^^^ has namespace")
+
+                let namespace = val.split(":")[0]
+                namespace = namespace.startsWith("#") ? namespace.split("").splice(1).join("") : namespace
+                if (autocomplete[j].namespace != namespace) continue
+                if (autocomplete[j].id.startsWith(val.split(":")[1]) == false) continue //TODO: поиск в середине а не только в начале (search). сделай
+            }
+            else {
+                // console.log("^^^ no namespace")
+                // console.log(JSON.stringify(autocomplete[j]) + "   |   " + "id.search(" + val_no_tag + ") = " + autocomplete[j].id.includes(val_no_tag) + "   |   " + "namespace.search(" + val + ") = " + autocomplete[j].namespace.includes(val))
+                //^^^ не везде val на val_no_tag заменен и search не заменен в строках на inncludes
+                if (!autocomplete[j].id.includes(val_no_tag) && !autocomplete[j].namespace.includes(val_no_tag)) continue
+            }
+
+            suggestions_raw.push(autocomplete[j])
+
+
+
+        }
+        // console.log(suggestions_raw)
+        raw_autocompletes_to_html(suggestions_raw)
+
+
+        isProcessing = false;
+    };
 }
+
+for (let i = 0; i < autocomplete_fields.length; i++) {
+    autocomplete_fields[i].addEventListener("focus", () => {
+        selected_autocomplete_field = autocomplete_fields[i];
+        for (let j = 0; j < autocomplete_fields.length; j++) {
+            autocomplete_fields[j].classList.remove("last-selected-autocomplete");
+        }
+        selected_autocomplete_field.classList.add("last-selected-autocomplete");
+    });
+
+    autocomplete_fields[i].addEventListener("input", handleInput(i));
+
+}
+
 async function clearAutocomplete() {
     autocomplete = []
     try {
@@ -140,84 +163,10 @@ async function clearAutocomplete() {
     } catch (error) {
         console.error('Error saving autocompletes: ', error);
     } finally {
-        
+
     }
 }
-// async function loadAutocompletesFromDB() {
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             const indexedDB =
-//                 window.indexedDB ||
-//                 window.mozIndexedDB ||
-//                 window.webkitIndexedDB ||
-//                 window.msIndexedDB;
 
-//             if (!indexedDB) {
-//                 reject(new Error('IndexedDB is not supported in this browser'));
-//                 return;
-//             }
-
-//             let request = indexedDB.open('autocompletes', 1);
-
-//             request.onupgradeneeded = event => {
-//                 const db = event.target.result;
-//                 db.createObjectStore('autocompletes', { keyPath: 'filename' });
-//             };
-
-//             let db;
-//             request.onsuccess = () => {
-//                 db = request.result;
-//                 const transaction = db.transaction('autocompletes', 'readonly');
-//                 const store = transaction.objectStore('autocompletes');
-//                 const allDataRequest = store.getAll();
-
-//                 allDataRequest.onsuccess = () => resolve(allDataRequest.result);
-//                 allDataRequest.onerror = () => reject(allDataRequest.error);
-//             };
-
-//             request.onerror = () => reject(request.error);
-//         } catch (error) {
-//             reject(error);
-//         }
-//     });
-// }
-
-// async function loadAutocompletesFromDB() {
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             let indexedDB =
-//                 window.indexedDB ||
-//                 window.mozIndexedDB ||
-//                 window.webkitIndexedDB ||
-//                 window.msIndexedDB;
-//             let request = indexedDB.open('autocompletes', 1);
-
-
-
-
-
-//             request.onupgradeneeded = event => {
-//                 const db = event.target.result;
-//                 db.createObjectStore('autocompletes', { keyPath: 'filename' });
-//             };
-//             const db = await new Promise((resolve, reject) => {
-//                 request.onsuccess = () => resolve(request.result);
-//                 request.onerror = () => reject(request.error);
-//             });
-
-//             const transaction = db.transaction('autocompletes', 'readonly'); //why Uncaught (in promise) DOMException: Failed to execute 'transaction' on 'IDBDatabase': One of the specified object stores was not found.
-//             const store = transaction.objectStore('autocompletes');
-//             const allDataRequest = store.getAll();
-//             console.log(allDataRequest)
-
-//             allDataRequest.onsuccess = () => resolve(allDataRequest.result);
-//             allDataRequest.onerror = () => reject(allDataRequest.error);
-//         } catch (error) {
-//             reject(error);
-//         }
-//     });
-
-// }
 async function loadAutocompletesFromDB() {
     if (isLoading) return;
 
@@ -287,14 +236,14 @@ async function saveAutocompletesToDB() {
 
 document.getElementById('archiveUploadButton').addEventListener('click', async () => {
     const input = document.getElementById('archiveInput');
-    
+
     if (input.files.length === 0) {
         alert('Пожалуйста, выберите архив.');
         return;
     }
 
     const file = input.files[0];
-    
+
     if (!file.name.endsWith('.zip')) {
         alert('Пожалуйста, загрузите архив в формате .zip');
         return;
@@ -314,7 +263,7 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
             let filename_no_zip_name = filename.split('/').splice(1).join('/')
             // TODO: обработка метаданных
             let parts = filename_no_zip_name.split('__');
-            
+
             if (/\.(png|gif|apng|jpg|jpeg|svg)$/i.test(filename)) {
                 imagePromises.push(zip.files[filename].async('base64').then((data) => ({
                     isTag: false,
@@ -329,7 +278,7 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
 
         const images = await Promise.all(imagePromises);
         console.log(images); // Массив объектов { filename: str, image: base64 str }
-        
+
         for (const image of images) {
             let doesExist = false
             for (const autocomplete_item of autocomplete) {
