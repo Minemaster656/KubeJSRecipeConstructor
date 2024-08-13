@@ -1,7 +1,7 @@
 let selected_autocomplete_field = null
 let isLoading = false
-//! {"isTag":boolean, "namespace":string, "id":string}
-let autocomplete = [
+// id:base64img
+let autocomplete = {
     // { "isTag": true, "namespace": "minecraft", "id": "moss_replacable" },
     // { "isTag": true, "namespace": "forge", "id": "ores" },
     // { "isTag": false, "namespace": "minecraft", "id": "air" },
@@ -9,25 +9,26 @@ let autocomplete = [
     // { "isTag": false, "namespace": "minecraft", "id": "water_bucket" },
     // { "isTag": false, "namespace": "create", "id": "zink_ingot" },
     // { "isTag": false, "namespace": "create", "id": "andesite_alloy" }
-]
+}
 
 let autocomplete_fields = document.querySelectorAll(".autocomplete");
 
 let lastCallTime = 0;
 let isProcessing = false;
 
-const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
+const raw_autocompletes_to_html = async (autocomplete_suggestions_raw_ids) => {
 
 
     const MAX_SUGGESTIONS = 20
-    autocomplete_suggestions_raw = autocomplete_suggestions_raw.slice(0, MAX_SUGGESTIONS)
+    autocomplete_suggestions_raw_ids = autocomplete_suggestions_raw_ids.slice(0, MAX_SUGGESTIONS)
     let existing_autocompletes = document.querySelectorAll(".autocomplete-suggestion");
-    let autocomplete_suggestions_strings = []
-    let images_for_suggestions = {}
-    for (let i = 0; i < autocomplete_suggestions_raw.length; i++) {
-        autocomplete_suggestions_strings.push((autocomplete_suggestions_raw[i].isTag ? "#" : "") + autocomplete_suggestions_raw[i].namespace + ":" + autocomplete_suggestions_raw[i].id)
-        images_for_suggestions[autocomplete_suggestions_strings[i]] = autocomplete_suggestions_raw[i].image
-    }
+    // let autocomplete_suggestions_strings = []
+    // let images_for_suggestions = {}
+    // for (let i = 0; i < autocomplete_suggestions_raw.length; i++) {
+    //     autocomplete_suggestions_strings.push((autocomplete_suggestions_raw[i].isTag ? "#" : "") + autocomplete_suggestions_raw[i].namespace + ":" + autocomplete_suggestions_raw[i].id)
+    //     images_for_suggestions[autocomplete_suggestions_strings[i]] = autocomplete_suggestions_raw[i].image
+    // }
+
 
     // autocomplete_suggestions_strings = autocomplete_suggestions_raw.forEach(e => {
     //     console.log(e.isTag ? "#" : "" + e.namespace + ":" + e.id)
@@ -40,9 +41,9 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
     for (let i = 0; i < existing_autocompletes.length; i++) {
         let autocomplete_text = existing_autocompletes[i].querySelector(".autocomplete-suggestion-text").innerText;
         let found_lazy = false
-        for (let j = 0; j < autocomplete_suggestions_strings.length; j++) {
-            if (autocomplete_text === autocomplete_suggestions_strings[j]) {
-                lazy_new.push(autocomplete_suggestions_strings[j])
+        for (let j = 0; j < autocomplete_suggestions_raw_ids.length; j++) {
+            if (autocomplete_text === autocomplete_suggestions_raw_ids[j]) {
+                lazy_new.push(autocomplete_suggestions_raw_ids[j])
                 found_lazy = true
                 break
             }
@@ -57,22 +58,23 @@ const raw_autocompletes_to_html = async (autocomplete_suggestions_raw) => {
         remove_existing[i].remove()
     }
 
-    for (let i = 0; i < autocomplete_suggestions_strings.length; i++) {
-        if (lazy_new.includes(autocomplete_suggestions_strings[i])) continue
+    for (let i = 0; i < autocomplete_suggestions_raw_ids.length; i++) {
+        if (lazy_new.includes(autocomplete_suggestions_raw_ids[i])) continue
 
         let li = document.createElement("div");
         li.classList.add("autocomplete-suggestion");
         let iconcont = document.createElement("div");
         iconcont.classList.add("item-icon-container");
         let icon = document.createElement("img");
-        icon.src = images_for_suggestions[autocomplete_suggestions_strings[i]] != "" ? images_for_suggestions[autocomplete_suggestions_strings[i]] : "assets/missing.svg";
+        // icon.src = images_for_suggestions[autocomplete_suggestions_strings[i]] != "" ? images_for_suggestions[autocomplete_suggestions_strings[i]] : "assets/missing.svg";
+        icon.src = autocomplete[autocomplete_suggestions_raw_ids[i]] != "" ? autocomplete[autocomplete_suggestions_raw_ids[i]] : "assets/missing.svg";
         icon.classList.add("item-icon");
         iconcont.appendChild(icon);
         li.appendChild(iconcont);
         let autocompleteSuggestionText = document.createElement("div");
         autocompleteSuggestionText.classList.add("autocomplete-suggestion-text");
         let ast_p = document.createElement("p");
-        ast_p.innerText = autocomplete_suggestions_strings[i];
+        ast_p.innerText = autocomplete_suggestions_raw_ids[i];
         autocompleteSuggestionText.appendChild(ast_p);
         li.appendChild(autocompleteSuggestionText);
         document.querySelector(".autocomplete-suggestions").appendChild(li);
@@ -95,43 +97,65 @@ const handleInput = (i) => {
 
         // console.clear()
         let val = autocomplete_fields[i].value;
-        let val_no_tag = val.startsWith("#") ? val.split("").splice(1).join("") : val
-        let suggestions_raw = []
-        for (let j = 0; j < autocomplete.length; j++) {
-            if (val[0] === "#" & !autocomplete[j].isTag || val[0] !== "#" & autocomplete[j].isTag) continue
-            //console.log(`${autocomplete[j].isTag ? '#' : ''}${autocomplete[j].namespace}:${autocomplete[j].id}`)
-            // console.log(val + "   |   " + JSON.stringify(autocomplete[j]))
-            
-            if (val.includes(":")) {
-                // console.log("^^^ has namespace")
+        // let val_no_tag = val.startsWith("#") ? val.split("").splice(1).join("") : val
+        let suggestions_raw_ids = []
+        // for (let j = 0; j < autocomplete.length; j++) {
+        //     if (val[0] === "#" & !autocomplete[j].isTag || val[0] !== "#" & autocomplete[j].isTag) continue
+        //     //console.log(`${autocomplete[j].isTag ? '#' : ''}${autocomplete[j].namespace}:${autocomplete[j].id}`)
+        //     // console.log(val + "   |   " + JSON.stringify(autocomplete[j]))
 
-                let namespace = val.split(":")[0]
-                namespace = namespace.startsWith("#") ? namespace.split("").splice(1).join("") : namespace
-                if (autocomplete[j].namespace != namespace) continue
-                if (autocomplete[j].id.startsWith(val.split(":")[1]) == false) continue //TODO: поиск в середине а не только в начале (search). сделай
-            }
-            else {
-                // console.log("^^^ no namespace")
-                // console.log(JSON.stringify(autocomplete[j]) + "   |   " + "id.search(" + val_no_tag + ") = " + autocomplete[j].id.includes(val_no_tag) + "   |   " + "namespace.search(" + val + ") = " + autocomplete[j].namespace.includes(val))
-                //^^^ не везде val на val_no_tag заменен и search не заменен в строках на inncludes
-                console.log(val_no_tag)
-                if (!autocomplete[j].id.includes(val_no_tag)) continue
-                if (!autocomplete[j].namespace.includes(val_no_tag)) continue
-            }
+        //     if (val.includes(":")) {
+        //         // console.log("^^^ has namespace")
 
-            suggestions_raw.push(autocomplete[j])
+        //         let namespace = val.split(":")[0]
+        //         namespace = namespace.startsWith("#") ? namespace.split("").splice(1).join("") : namespace
+        //         if (autocomplete[j].namespace != namespace) continue
+        //         if (autocomplete[j].id.startsWith(val.split(":")[1]) == false) continue //TODO: поиск в середине а не только в начале (search). сделай
+        //     }
+        //     else {
+        //         // console.log("^^^ no namespace")
+        //         // console.log(JSON.stringify(autocomplete[j]) + "   |   " + "id.search(" + val_no_tag + ") = " + autocomplete[j].id.includes(val_no_tag) + "   |   " + "namespace.search(" + val + ") = " + autocomplete[j].namespace.includes(val))
+        //         //^^^ не везде val на val_no_tag заменен и search не заменен в строках на inncludes
+        //         console.log(val_no_tag)
+        //         if (!autocomplete[j].id.includes(val_no_tag)) continue
+        //         if (!autocomplete[j].namespace.includes(val_no_tag)) continue
+        //     }
+
+        //     suggestions_raw.push(autocomplete[j])
 
 
 
+        // }
+        let ids = Object.keys(autocomplete)
+        for (let j = 0; j < ids.length; j++) {
+            if (ids[j].includes(val)) suggestions_raw_ids.push(ids[j])
         }
+        //sorting by alphabet
+        suggestions_raw_ids.sort()
+        suggestions_raw_ids = sortIDsByNamespaceEntryFirst(suggestions_raw_ids, val)
+
         // console.log(suggestions_raw)
-        raw_autocompletes_to_html(suggestions_raw)
+        raw_autocompletes_to_html(suggestions_raw_ids)
 
 
         isProcessing = false;
     };
 }
-
+function sortIDsByNamespaceEntryFirst(ids, namespace_entry) {
+    selected_ids_by_namespace = []
+    selected_ids_by_id = []
+    for (let i = 0; i < ids.length; i++) {
+        let id_no_tag = ids[i].startsWith("#") ? ids[i].split("").splice(1).join("") : ids[i]
+        if (id_no_tag.startsWith(namespace_entry)) {
+            selected_ids_by_namespace.push(ids[i])
+        } else{
+            selected_ids_by_id.push(ids[i])
+        }
+    }
+    selected_ids_by_namespace.sort()
+    selected_ids_by_id.sort()
+    return selected_ids_by_namespace.concat(selected_ids_by_id)
+}
 for (let i = 0; i < autocomplete_fields.length; i++) {
     autocomplete_fields[i].addEventListener("focus", () => {
         selected_autocomplete_field = autocomplete_fields[i];
@@ -146,7 +170,7 @@ for (let i = 0; i < autocomplete_fields.length; i++) {
 }
 
 async function clearAutocomplete() {
-    autocomplete = []
+    autocomplete = {}
     try {
 
         const request = indexedDB.open('myDatabase', 1);
@@ -163,8 +187,11 @@ async function clearAutocomplete() {
         const transaction = db.transaction('autocompletes', 'readwrite');
         const store = transaction.objectStore('autocompletes');
         store.clear();
-        for (const item of autocomplete) {
-            store.add(item);
+        // for (const item of autocomplete) {
+        //     store.add(item);
+        // }
+        for (key of Object.keys(autocomplete)) {
+            store.put({ "id": key, "value": autocomplete[key] });
         }
 
 
@@ -184,7 +211,7 @@ async function loadAutocompletesFromDB() {
 
         request.onupgradeneeded = event => {
             const db = event.target.result;
-            db.createObjectStore('autocompletes', { keyPath: 'filename' });
+            db.createObjectStore('autocompletes', { keyPath: 'id' });
         };
 
         const db = await new Promise((resolve, reject) => {
@@ -196,11 +223,17 @@ async function loadAutocompletesFromDB() {
         const store = transaction.objectStore('autocompletes');
         const allDataRequest = store.getAll();
 
+
         allDataRequest.onsuccess = () => {
-            const imagesArray = allDataRequest.result;
+            //const imagesArray = allDataRequest.result;
+            let results = allDataRequest.result;
             // console.log('Loaded images:', imagesArray);
-            console.log(`Loaded ${imagesArray.length} autocomplete entries from IndexedDB`);
-            autocomplete = imagesArray;
+
+            //autocomplete = imagesArray;
+            results.forEach(item => {
+                autocomplete[item.id] = item.value; // Замените 'value' на ваше поле
+            });
+            console.log(`Loaded ${Object.keys(autocomplete).length} autocomplete entries from IndexedDB`);
         };
     } catch (error) {
         console.error('Error loading autocompletes: ', error);
@@ -220,7 +253,7 @@ async function saveAutocompletesToDB() {
 
         request.onupgradeneeded = event => {
             const db = event.target.result;
-            db.createObjectStore('autocompletes', { keyPath: 'filename' });
+            db.createObjectStore('autocompletes', { keyPath: 'id' });
         };
         const db = await new Promise((resolve, reject) => {
             request.onsuccess = () => resolve(request.result);
@@ -230,8 +263,11 @@ async function saveAutocompletesToDB() {
         const transaction = db.transaction('autocompletes', 'readwrite');
         const store = transaction.objectStore('autocompletes');
         store.clear();
-        for (const item of autocomplete) {
-            store.add(item);
+        // for (const item of autocomplete) {
+        //     store.put(item);
+        // }
+        for (key of Object.keys(autocomplete)) {
+            store.put({ "id": key, "value": autocomplete[key] });
         }
 
 
@@ -241,7 +277,7 @@ async function saveAutocompletesToDB() {
         isLoading = false;
     }
 }
-
+//! UPLOAD ZIP
 document.getElementById('archiveUploadButton').addEventListener('click', async () => {
     const input = document.getElementById('archiveInput');
 
@@ -286,17 +322,16 @@ document.getElementById('archiveUploadButton').addEventListener('click', async (
         });
 
         const images = await Promise.all(imagePromises);
-        console.log(images); // Массив объектов { filename: str, image: base64 str }
+
 
         for (const image of images) {
-            let doesExist = false
-            for (const autocomplete_item of autocomplete) {
-                if (autocomplete_item.id == image.id && autocomplete_item.namespace == image.namespace && autocomplete_item.nbt == image.nbt) {
-                    doesExist = true
-                    break
-                }
+            let compiled_id = (image.isTag ? "#" : "") + image.namespace + ":" + image.id
+            if (autocomplete[compiled_id] === undefined) {
+                autocomplete[compiled_id] = image.image;
+                
             }
-            if (!doesExist) autocomplete.push(image);
+
+
         }
         saveAutocompletesToDB();
         alert('Загружено ' + images.length + ' автодополнений.');
